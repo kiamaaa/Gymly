@@ -10,7 +10,7 @@ class WorkoutExercise(db.Model):
     sets = db.Column(db.Integer, nullable=False)
     reps = db.Column(db.Integer, nullable=False)
     weight_used = db.Column(db.Float, nullable=False)
-    time_taken = db.Column(db.Integer)       # in seconds
+    time_taken = db.Column(db.Integer)       
     calories_burned = db.Column(db.Integer)
 
     workout = db.relationship('Workout', back_populates='workout_exercises')
