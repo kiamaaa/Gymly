@@ -1,0 +1,7 @@
+from schemas.muscle_group import MuscleGroupSchema
+from schemas.exercise import ExerciseSchema
+from schemas.user import UserSchema
+from schemas.fitness_profile import FitnessProfileSchema
+from schemas.workout import WorkoutSchema
+from schemas.progress_log import ProgressLogSchema
+from schemas.workout_exercise import WorkoutExerciseSchema
