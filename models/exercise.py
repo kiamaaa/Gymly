@@ -11,7 +11,7 @@ class Exercise(db.Model):
     muscle_group_id = db.Column(db.Integer, db.ForeignKey('muscle_group.id'), nullable=False)
 
     muscle_group = db.relationship('MuscleGroup', back_populates='exercises')
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise')
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercises')
 
     def __repr__(self):
         return f"<Exercise {self.name}>"
