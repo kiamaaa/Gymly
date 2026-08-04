@@ -1,0 +1,36 @@
+[33m2e384aa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: reset: moving to HEAD~9
+[33m4936bb0[m HEAD@{1}: Branch: renamed refs/heads/main to refs/heads/main
+[33m4936bb0[m HEAD@{3}: commit: initialize React frontend with Vite
+[33m534a1ec[m HEAD@{4}: Branch: renamed refs/heads/main to refs/heads/main
+[33m534a1ec[m HEAD@{6}: commit: add red and black theme styling
+[33mf835b7e[m HEAD@{7}: commit: add simple React frontend: auth, workout create/list, loading and error states
+[33mf2910ee[m HEAD@{8}: Branch: renamed refs/heads/main to refs/heads/main
+[33mf2910ee[m HEAD@{10}: commit: Create boilerplate code for client side with react
+[33m7ed5fc7[m HEAD@{11}: Branch: renamed refs/heads/main to refs/heads/main
+[33m7ed5fc7[m HEAD@{13}: commit: create the routes file for endpoints
+[33m1969f23[m HEAD@{14}: Branch: renamed refs/heads/main to refs/heads/main
+[33m1969f23[m HEAD@{16}: commit: changes made to match project requirments
+[33m231be51[m HEAD@{17}: Branch: renamed refs/heads/main to refs/heads/main
+[33m231be51[m HEAD@{19}: commit: run initial migration, create all 7 tables
+[33m3bd5e03[m HEAD@{20}: commit: add .gitignore, wire up extensions and app factory in main.py
+[33mb811770[m HEAD@{21}: Branch: renamed refs/heads/main to refs/heads/main
+[33mb811770[m HEAD@{23}: commit: update the main.py and extension.py files
+[33m2e384aa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{24}: Branch: renamed refs/heads/main to refs/heads/main
+[33m2e384aa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{26}: commit: create contoller files for the gymly application
+[33mdf8e7b3[m HEAD@{27}: Branch: renamed refs/heads/main to refs/heads/main
+[33mdf8e7b3[m HEAD@{29}: commit: create schema files for gymly application
+[33m1b45f67[m HEAD@{30}: Branch: renamed refs/heads/main to refs/heads/main
+[33m1b45f67[m HEAD@{32}: commit: create models for the gymly application
+[33m89283e9[m HEAD@{33}: Branch: renamed refs/heads/main to refs/heads/main
+[33m89283e9[m HEAD@{35}: commit: create models for the gymly application
+[33m36c2645[m HEAD@{36}: Branch: renamed refs/heads/main to refs/heads/main
+[33m36c2645[m HEAD@{38}: commit: Create a pipfile to install all dependencies
+[33m1715ef6[m HEAD@{39}: Branch: renamed refs/heads/main to refs/heads/main
+[33m1715ef6[m HEAD@{41}: commit: create a README file for the gymly application
+[33mf95458f[m HEAD@{42}: Branch: renamed refs/heads/main to refs/heads/main
+[33mf95458f[m HEAD@{44}: Branch: renamed refs/heads/main to refs/heads/main
+[33mf95458f[m HEAD@{46}: Branch: renamed refs/heads/main to refs/heads/main
+[33mf95458f[m HEAD@{48}: Branch: renamed refs/heads/main to refs/heads/main
+[33mf95458f[m HEAD@{50}: commit: set up folder structure for the full stack application
+[33mf3caadc[m HEAD@{51}: Branch: renamed refs/heads/master to refs/heads/main
+[33mf3caadc[m HEAD@{53}: commit (initial): set up full stack application's project structure

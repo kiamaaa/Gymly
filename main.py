@@ -18,7 +18,7 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
     ma.init_app(app)
-    cors.init_app(app, origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"])
+    cors.init_app(app, origins=["http://localhost:5175", "http://localhost:5174", "http://localhost:3000"])
 
     import models
     from routes import register_routes
@@ -27,6 +27,6 @@ def create_app():
     return app
 
 app = create_app()
-
+  
 if __name__ == '__main__':
     app.run(debug=True)
