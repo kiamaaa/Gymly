@@ -23,7 +23,6 @@ progress_log_schema = ProgressLogSchema()
 progress_logs_schema = ProgressLogSchema(many=True)
 fitness_profile_schema = FitnessProfileSchema()
 
-
 def paginated_response(pagination, schema):
     return {
         "data": schema.dump(pagination.items),
@@ -33,22 +32,19 @@ def paginated_response(pagination, schema):
         "total_pages": pagination.pages,
     }
 
-
 def is_admin():
-    user = User.query.get(get_jwt_identity())
+    user = User.query.get(int(get_jwt_identity()))
     return user is not None and user.role == "admin"
-
 
 def register_routes(app):
 
-    
     @app.route("/api/register", methods=["POST"])
     def register():
         data = request.get_json()
         user = UserController.register(data)
         if not user:
             return jsonify({"error": "username or email already taken"}), 409
-        token = create_access_token(identity=user.id)
+        token = create_access_token(identity=str(user.id))
         return jsonify({"token": token, "user": {"id": user.id, "username": user.username, "role": user.role}}), 201
 
     @app.route("/api/login", methods=["POST"])
@@ -57,10 +53,9 @@ def register_routes(app):
         user = UserController.authenticate(data.get("email"), data.get("password"))
         if not user:
             return jsonify({"error": "invalid email or password"}), 401
-        token = create_access_token(identity=user.id)
+        token = create_access_token(identity=str(user.id))
         return jsonify({"token": token, "user": {"id": user.id, "username": user.username, "role": user.role}}), 200
 
-    
     @app.route("/api/muscle-groups", methods=["GET"])
     @jwt_required()
     def list_muscle_groups():
@@ -96,7 +91,6 @@ def register_routes(app):
             return jsonify({"error": "not found"}), 404
         return "", 204
 
-    
     @app.route("/api/exercises", methods=["GET"])
     @jwt_required()
     def list_exercises():
@@ -141,11 +135,10 @@ def register_routes(app):
             return jsonify({"error": "not found"}), 404
         return "", 204
 
-    
     @app.route("/api/profile", methods=["GET"])
     @jwt_required()
     def get_profile():
-        profile = FitnessProfileController.get_by_user(get_jwt_identity())
+        profile = FitnessProfileController.get_by_user(int(get_jwt_identity()))
         if not profile:
             return jsonify({"error": "no profile yet"}), 404
         return jsonify(fitness_profile_schema.dump(profile)), 200
@@ -153,34 +146,46 @@ def register_routes(app):
     @app.route("/api/profile", methods=["POST"])
     @jwt_required()
     def create_profile():
-        profile = FitnessProfileController.create(get_jwt_identity(), request.get_json())
+        profile = FitnessProfileController.create(int(get_jwt_identity()), request.get_json())
         return jsonify(fitness_profile_schema.dump(profile)), 201
 
     @app.route("/api/profile", methods=["PATCH"])
     @jwt_required()
     def update_profile():
-        profile = FitnessProfileController.update(get_jwt_identity(), request.get_json())
+        profile = FitnessProfileController.update(int(get_jwt_identity()), request.get_json())
         return jsonify(fitness_profile_schema.dump(profile)), 200
 
-    
     @app.route("/api/workouts", methods=["GET"])
     @jwt_required()
     def list_workouts():
-        page = request.args.get("page", 1, type=int)
-        per_page = request.args.get("per_page", 10, type=int)
-        pagination = WorkoutController.get_all_for_user(get_jwt_identity(), page, per_page)
-        return jsonify(paginated_response(pagination, workouts_schema)), 200
+        try:
+            user_id = int(get_jwt_identity())
+            page = request.args.get("page", 1, type=int)
+            per_page = request.args.get("per_page", 10, type=int)
+            pagination = WorkoutController.get_all_for_user(user_id, page, per_page)
+            return jsonify(paginated_response(pagination, workouts_schema)), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 422
 
     @app.route("/api/workouts", methods=["POST"])
     @jwt_required()
     def create_workout():
-        workout = WorkoutController.create(get_jwt_identity(), request.get_json())
-        return jsonify(workout_schema.dump(workout)), 201
+        try:
+            user_id = int(get_jwt_identity())
+            data = request.get_json()
+            
+            if not data.get('name'):
+                return jsonify({"error": "Workout name is required"}), 422
+                
+            workout = WorkoutController.create(user_id, data)
+            return jsonify(workout_schema.dump(workout)), 201
+        except Exception as e:
+            return jsonify({"error": str(e)}), 422
 
     @app.route("/api/workouts/<int:id>", methods=["GET"])
     @jwt_required()
     def get_workout(id):
-        workout = WorkoutController.get_by_id(id, get_jwt_identity())
+        workout = WorkoutController.get_by_id(id, int(get_jwt_identity()))
         if not workout:
             return jsonify({"error": "not found"}), 404
         return jsonify(workout_schema.dump(workout)), 200
@@ -188,7 +193,7 @@ def register_routes(app):
     @app.route("/api/workouts/<int:id>", methods=["PATCH"])
     @jwt_required()
     def update_workout(id):
-        workout = WorkoutController.update(id, get_jwt_identity(), request.get_json())
+        workout = WorkoutController.update(id, int(get_jwt_identity()), request.get_json())
         if not workout:
             return jsonify({"error": "not found"}), 404
         return jsonify(workout_schema.dump(workout)), 200
@@ -196,53 +201,51 @@ def register_routes(app):
     @app.route("/api/workouts/<int:id>", methods=["DELETE"])
     @jwt_required()
     def delete_workout(id):
-        if not WorkoutController.delete(id, get_jwt_identity()):
+        if not WorkoutController.delete(id, int(get_jwt_identity())):
             return jsonify({"error": "not found"}), 404
         return "", 204
-
 
     @app.route("/api/progress-logs", methods=["GET"])
     @jwt_required()
     def list_progress_logs():
         page = request.args.get("page", 1, type=int)
         per_page = request.args.get("per_page", 10, type=int)
-        pagination = ProgressLogController.get_all_for_user(get_jwt_identity(), page, per_page)
+        pagination = ProgressLogController.get_all_for_user(int(get_jwt_identity()), page, per_page)
         return jsonify(paginated_response(pagination, progress_logs_schema)), 200
 
     @app.route("/api/progress-logs", methods=["POST"])
     @jwt_required()
     def create_progress_log():
-        log = ProgressLogController.create(get_jwt_identity(), request.get_json())
+        log = ProgressLogController.create(int(get_jwt_identity()), request.get_json())
         return jsonify(progress_log_schema.dump(log)), 201
 
     @app.route("/api/progress-logs/<int:id>", methods=["DELETE"])
     @jwt_required()
     def delete_progress_log(id):
-        if not ProgressLogController.delete(id, get_jwt_identity()):
+        if not ProgressLogController.delete(id, int(get_jwt_identity())):
             return jsonify({"error": "not found"}), 404
         return "", 204
 
-    
     @app.route("/api/exercises/<int:exercise_id>/progress", methods=["GET"])
     @jwt_required()
     def exercise_progress(exercise_id):
-        data = WorkoutController.get_exercise_progress(get_jwt_identity(), exercise_id)
+        data = WorkoutController.get_exercise_progress(int(get_jwt_identity()), exercise_id)
         return jsonify(data), 200
 
     @app.route("/api/stats/weekly", methods=["GET"])
     @jwt_required()
     def weekly_stats():
-        data = WorkoutController.get_weekly_stats(get_jwt_identity())
+        data = WorkoutController.get_weekly_stats(int(get_jwt_identity()))
         return jsonify(data), 200
 
     @app.route("/api/recommendations", methods=["GET"])
     @jwt_required()
     def recommendations():
-        data = WorkoutController.get_recommendations(get_jwt_identity())
+        data = WorkoutController.get_recommendations(int(get_jwt_identity()))
         return jsonify(data), 200
 
     @app.route("/api/rank", methods=["GET"])
     @jwt_required()
     def rank():
-        data = WorkoutController.get_rank(get_jwt_identity())
+        data = WorkoutController.get_rank(int(get_jwt_identity()))
         return jsonify(data), 200

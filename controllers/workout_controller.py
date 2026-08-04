@@ -10,7 +10,7 @@ from extensions import db
 
 class WorkoutController:
 
-    # ------------------------------------------------------------ CRUD
+    
     @classmethod
     def get_all_for_user(cls, user_id, page=1, per_page=10):
         return (

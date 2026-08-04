@@ -7,5 +7,5 @@ class WorkoutExerciseSchema(ma.SQLAlchemyAutoSchema):
         model = WorkoutExercise
         load_instance = True
         include_fk = True
-
+        exclude = ('workout',)  
     exercise = ma.Nested('ExerciseSchema', only=('id', 'name', 'equipment'))

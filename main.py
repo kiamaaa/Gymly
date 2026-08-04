@@ -1,11 +1,11 @@
 import os
 from flask import Flask
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 from extensions import db, migrate, jwt, ma, cors
 
 load_dotenv()
-
 
 def create_app():
     app = Flask(__name__)
@@ -18,15 +18,13 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
     ma.init_app(app)
-    cors.init_app(app)
+    cors.init_app(app, origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"])
 
-    import models  
-
-    from controllers import register_blueprints
-    register_blueprints(app)
+    import models
+    from routes import register_routes
+    register_routes(app)
 
     return app
-
 
 app = create_app()
 
