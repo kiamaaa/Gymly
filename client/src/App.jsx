@@ -1,122 +1,119 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+export default function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+
+  const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [date, setDate] = useState('');
+
+  useEffect(() => {
+    if (token) loadWorkouts();
+  }, [token]);
+
+  async function loadWorkouts() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${BASE_URL}/api/workouts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Could not load workouts');
+      const data = await res.json();
+      setWorkouts(data.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleAuth(e) {
+    e.preventDefault();
+    setError(null);
+    try {
+      const endpoint = isRegistering ? '/api/register' : '/api/login';
+      const body = isRegistering ? { username, email, password } : { email, password };
+
+      const res = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+      const data = await res.json();
+
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+    setToken(null);
+    setWorkouts([]);
+  }
+
+  async function handleAddWorkout(e) {
+    e.preventDefault();
+    await fetch(`${BASE_URL}/api/workouts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name, date, exercises: [] }),
+    });
+    setName('');
+    setDate('');
+    loadWorkouts();
+  }
+
+  if (!token) {
+    return (
+      <div>
+        <h1 className="brand">GYMLY</h1>
+        <h2>{isRegistering ? 'Register' : 'Log In'}</h2>
+        <form onSubmit={handleAuth}>
+          {isRegistering && (
+            <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+          )}
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <button type="submit">{isRegistering ? 'Register' : 'Log In'}</button>
+        </form>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button onClick={() => setIsRegistering(!isRegistering)}>
+          {isRegistering ? 'Have an account? Log in' : 'No account? Register'}
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <button onClick={handleLogout}>Log Out</button>
 
-      <div className="ticks"></div>
+      <h2>Add a Workout</h2>
+      <form onSubmit={handleAddWorkout}>
+        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+        <button type="submit">Add</button>
+      </form>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <h2>Your Workouts</h2>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <ul>
+        {workouts.map((w) => <li key={w.id}>{w.name} — {w.date}</li>)}
+      </ul>
+    </div>
+  );
 }
-
-export default App
