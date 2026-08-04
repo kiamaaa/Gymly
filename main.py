@@ -26,7 +26,9 @@ def create_app():
         "https://gymly-rho.vercel.app",
         "https://gymly.vercel.app",
         "https://gymly-bryemhosj-idk-e262.vercel.app",
-        "https://gymly-client.vercel.app"
+        "https://gymly-client.vercel.app",
+        "https://gymly-34du.vercel.app"
+        
     ])
 
     import models
