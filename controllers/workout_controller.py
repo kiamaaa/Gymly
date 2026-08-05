@@ -10,7 +10,6 @@ from extensions import db
 
 class WorkoutController:
 
-    
     @classmethod
     def get_all_for_user(cls, user_id, page=1, per_page=10):
         return (
@@ -51,12 +50,44 @@ class WorkoutController:
     @classmethod
     def update(cls, id, user_id, data):
         workout = cls.get_by_id(id, user_id)
-        if workout:
-            workout.name = data.get("name", workout.name)
-            if data.get("date"):
-                workout.date = datetime.strptime(data["date"], "%Y-%m-%d").date()
-            workout.total_duration = data.get("total_duration", workout.total_duration)
-            db.session.commit()
+        if not workout:
+            return None
+        
+
+        workout.name = data.get("name", workout.name)
+        if data.get("date"):
+            workout.date = datetime.strptime(data["date"], "%Y-%m-%d").date()
+        workout.total_duration = data.get("total_duration", workout.total_duration)
+        
+        
+        if "exercises" in data and data["exercises"]:
+            for ex_data in data["exercises"]:
+                
+                existing = WorkoutExercise.query.filter_by(
+                    workout_id=workout.id,
+                    exercise_id=ex_data["exercise_id"]
+                ).first()
+                
+                if existing:
+                    
+                    existing.sets = ex_data.get("sets", existing.sets)
+                    existing.reps = ex_data.get("reps", existing.reps)
+                    existing.weight_used = ex_data.get("weight_used", existing.weight_used)
+                    existing.time_taken = ex_data.get("time_taken", existing.time_taken)
+                    existing.calories_burned = ex_data.get("calories_burned", existing.calories_burned)
+                else:
+                    
+                    db.session.add(WorkoutExercise(
+                        workout_id=workout.id,
+                        exercise_id=ex_data["exercise_id"],
+                        sets=ex_data["sets"],
+                        reps=ex_data["reps"],
+                        weight_used=ex_data["weight_used"],
+                        time_taken=ex_data.get("time_taken"),
+                        calories_burned=ex_data.get("calories_burned"),
+                    ))
+        
+        db.session.commit()
         return workout
 
     @classmethod
